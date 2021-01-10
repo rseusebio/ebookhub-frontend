@@ -1,0 +1,62 @@
+/**/
+.home-main-container
+{
+    width: 100vw;
+    height: 100vh;
+
+    overflow-x: hidden;
+    overflow-y: hidden;
+
+    padding: 0px;
+    margin: 0px;
+
+    background-color: white;
+}
+
+.home-header-container
+{
+    border-bottom: 1px solid lightgrey;
+
+    width: 100%;
+    height: 10%;
+    min-height: 55px;
+
+    padding: 0px;
+    margin: 0px;
+    padding-left: 10px;
+}
+
+.home-body-container
+{
+    width: 100%;
+    min-height: 90%;
+
+    overflow-y: scroll;
+
+    padding: 0px;
+    margin: 0px;
+}
+
+@media screen and ( min-height: 700px )
+{
+    .home-header-container
+    {
+        height: 5%;
+    }
+
+    .home-body-container
+    {
+        height: 95%;
+    }
+}
+
+.home-header
+{
+    font-family: 'Courier New', Courier, monospace;
+    color: gray;
+}
+
+.home-input
+{
+    width: 550px;
+}

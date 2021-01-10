@@ -1,25 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
+import    React, { FunctionComponent } from    "react";
+import    { BrowserRouter,
+            Switch, 
+            Route 
+          }                            from    "react-router-dom";
+import    LogInPage                    from    "./pages/LogIn";
+import    HomePage                     from    "./pages/Home";
+import    PrivateRoute                 from    "./navigation/PrivateRoute";
+
 import './App.css';
 
-function App() {
+const  App: FunctionComponent = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+
+      <Switch>
+
+        <PrivateRoute path="/private">
+
+          <div>
+            <p> Welcome back, user </p>
+          </div>
+
+        </PrivateRoute>
+
+        <PrivateRoute path="/home">
+
+          <HomePage/>
+          
+        </PrivateRoute>
+
+        <Route path="/">
+
+          <LogInPage/>
+
+        </Route>
+
+      </Switch>
+
+    </BrowserRouter>
   );
 }
 
