@@ -6,13 +6,13 @@ import      { SIGN_IN }                             from        "../gql/mutation
 import      TextField                               from        "@material-ui/core/TextField";
 import      Button                                  from        "@material-ui/core/Button";
 import      CircularProgress                        from        "@material-ui/core/CircularProgress";
-import      SignInResponse                          from        "../classes/SignInResponse";
+import      SignInData                              from        "../classes/SignInResponse";
 import      Alert                                   from        "@material-ui/lab/Alert";
-import      { useHistory }                          from        "react-router-dom";
+import      { Redirect, 
+              useHistory }                          from        "react-router-dom";
 import      { userVar }                             from        "../reactive-vars";
 
 import "./LogIn.css";
-
 
 
 const LogInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
@@ -34,10 +34,6 @@ const LogInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
 
         </div>
     );
-}
-
-const signInFunc = () => {
-    const username = document.getElementById("username").textContent;
 }
 
 enum UserInfo
@@ -88,7 +84,7 @@ const SignInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
     const [ emailStatus,    setEmailStatus    ]     =   useState( UserInfo.OK );
     const [ usernameStatus, setUsernameStatus ]     =   useState( UserInfo.OK );
 
-    const [ signIn, { data, error, loading } ] = useMutation<SignInResponse>( SIGN_IN );
+    const [ signIn, { data, error, loading } ] = useMutation<SignInData>( SIGN_IN );
 
     const history = useHistory( );
 
@@ -175,21 +171,28 @@ const SignInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
 
     if( error )
     {
-
         console.error( "internal error: ", error );
         err = ErrorType.INTERNAL;
     }
-    else if( !data )
+    else if( !data || !data.signIn )
     {
         // another type of error
     }
-    else if ( data && data.statusCode == 0 )
+    else if ( data && data.signIn )
     {
-        userVar( data.user );
 
-        history.push( "/home" );
+        const { user, statusCode } = data.signIn;
 
-        console.info( "updated user and redirected to home" );
+        if( statusCode  == 0 )
+        {
+            userVar( user );
+
+            history.push( "/home" );
+
+            // return (
+            //     <Redirect to={"/home"}/>
+            // )
+        }
     }
 
     return (

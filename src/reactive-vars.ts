@@ -5,6 +5,9 @@ import UserRecord from "./classes/UserRecord";
 const userVar = makeVar<UserRecord>( { } );
 
 
-export{
+console.info(`react vars has been created.`);
+
+
+export {
     userVar
 }

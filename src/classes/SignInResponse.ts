@@ -6,4 +6,9 @@ interface SignInResponse
     user: UserRecord;
 }
 
-export default SignInResponse;
+interface SignInData
+{
+    signIn: SignInResponse
+}
+
+export default SignInData;

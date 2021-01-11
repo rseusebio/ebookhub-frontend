@@ -16,23 +16,17 @@ const  App: FunctionComponent = () => {
       <Switch>
 
         <PrivateRoute path="/private">
-
           <div>
             <p> Welcome back, user </p>
           </div>
-
         </PrivateRoute>
 
         <PrivateRoute path="/home">
-
           <HomePage/>
-          
         </PrivateRoute>
 
         <Route path="/">
-
           <LogInPage/>
-
         </Route>
 
       </Switch>

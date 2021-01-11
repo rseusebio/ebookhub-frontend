@@ -5,7 +5,6 @@ const SIGN_IN = gql`
     {
         signIn( username: $username, email: $email, password: $pwd )
         {
-            succeeded
             statusCode
             user
             {

@@ -5,12 +5,15 @@ import      Button                           from       "@material-ui/core/Butto
 import      { UPLOAD_BOOK }                  from       "../gql/mutations";
 import      { useMutation }                  from       "@apollo/client";
 import      UploadBookResponse               from       "../classes/UploadBookResponse";
+import      { userVar }                      from       "../reactive-vars";
 
 import "./Home.css";
 
 const Home: FunctionComponent = ( props: any ) =>{ 
 
     const [ uploadBook, { data, error, loading } ] = useMutation<UploadBookResponse>( UPLOAD_BOOK );
+
+    const user = userVar( );
 
     const inputFileId = "inputFile";
 
@@ -20,14 +23,11 @@ const Home: FunctionComponent = ( props: any ) =>{
     {
         console.error( `error occoured: `, error );
     }
-    else if ( data || data.statusCode != 0 )
+    else if ( data )
     {
-        console.info( "external error: ", data );
+        // do something here
     }
-    else if( data )
-    {
-        console.info( data );
-    }
+
 
     return (
         <div className={ "home-main-container" }>
@@ -37,6 +37,12 @@ const Home: FunctionComponent = ( props: any ) =>{
                 <h3 className={ "home-header" }>
                     ebookhub
                 </h3>
+
+                <h4>
+                    {
+                        `hello, ${user.username}.`
+                    }
+                </h4>
 
             </div>
 

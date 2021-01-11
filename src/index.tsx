@@ -21,12 +21,10 @@ const cache = new InMemoryCache( );
 
 const options: ApolloClientOptions<NormalizedCacheObject> = {
   cache, 
-  // uri,
-  link
+  uri
 };
 
 const client = new ApolloClient( options );
-
 
 ReactDOM.render(
   // <React.StrictMode>
@@ -36,6 +34,8 @@ ReactDOM.render(
   // </React.StrictMode>,
   ,document.getElementById( "root" ) 
   );
+
+console.info(`client has been rendered.`);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
