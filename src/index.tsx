@@ -11,17 +11,16 @@ import    { ApolloClient,
 
 import "./index.css";
 
-const uri = "http://localhost:4000/graphql";
-
 const link = new HttpLink({
-  uri
+  uri: "http://localhost:4000/graphql",
+  credentials: "include"
 });
 
 const cache = new InMemoryCache( );
 
 const options: ApolloClientOptions<NormalizedCacheObject> = {
   cache, 
-  uri
+  link,
 };
 
 const client = new ApolloClient( options );

@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 
-const SIGN_IN = gql`
-    mutation SignIn( $username: String!, $email: String!, $pwd: String! )
+const LOG_IN = gql`
+    mutation LogIn
     {
-        signIn( username: $username, email: $email, password: $pwd )
+        logIn
         {
             statusCode
             user
@@ -18,4 +18,4 @@ const SIGN_IN = gql`
     }
 `;
 
-export default SIGN_IN;
+export default LOG_IN;

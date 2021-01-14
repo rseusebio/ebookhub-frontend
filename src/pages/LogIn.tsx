@@ -1,32 +1,179 @@
 import      React, { FunctionComponent, useState }  from        "react";
 import      { ArrowBack }                           from        "@material-ui/icons";
-import      { useMutation }                         from        "@apollo/client";
+import      { MutationFunctionOptions, useMutation }                         from        "@apollo/client";
 import      { validate }                            from        "email-validator";
-import      { SIGN_IN }                             from        "../gql/mutations";
+import      { SIGN_IN, 
+              LOG_IN }                              from        "../gql/mutations";
 import      TextField                               from        "@material-ui/core/TextField";
 import      Button                                  from        "@material-ui/core/Button";
 import      CircularProgress                        from        "@material-ui/core/CircularProgress";
-import      SignInData                              from        "../classes/SignInResponse";
 import      Alert                                   from        "@material-ui/lab/Alert";
-import      { Redirect, 
-              useHistory }                          from        "react-router-dom";
+import      { useHistory }                          from        "react-router-dom";
 import      { userVar }                             from        "../reactive-vars";
+import       LogInData                              from        "../classes/LogInData";
+import       SignInData                              from       "../classes/SignInData";
 
 import "./LogIn.css";
 
+enum InputStatus 
+{
+    OK = 0, 
+    INVALID_PASSWORD, 
+    INVALID_USERNAME
+};
+
 
 const LogInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
+
+    const [ logIn, { data, error, loading } ] = useMutation<LogInData>( LOG_IN );
+
+    let username = "";
+    let password = "";
+
+    const [ inputStatus, setInputStatus ] = useState( InputStatus.OK );
+
+    let AlertHolder = () => (<span></span>);
+
+    const history = useHistory( );
+
+    const user = userVar(  );
+
+    if( inputStatus === InputStatus.INVALID_USERNAME )
+    {
+        AlertHolder = () => (
+            <Alert
+                severity={ "warning" }>
+                Insert username in order to log in.
+            </Alert>
+        );
+    }
+    else if( inputStatus === InputStatus.INVALID_PASSWORD )
+    {
+        AlertHolder = () => (
+            <Alert
+                severity={ "warning" }>
+                Insert password in order to log in.
+            </Alert>
+        );
+    }
+    else if ( error )
+    {
+        console.info( "error: ", error );
+
+        AlertHolder = () => (
+            <Alert
+              severity={ "error" }>
+              An internal error has occurred. Please, contact support.
+            </Alert>
+        )
+    }
+    else if ( !loading )
+    {   
+        console.info("data received: ", data);
+
+        if ( !data || !data.logIn ) 
+        {
+            /* internal error */
+        }
+        else if( data.logIn.statusCode !== 0 )
+        {
+            /* id error */
+        }
+        else 
+        {
+            userVar( data.logIn.user );
+
+            history.push("/home");
+        }
+    }
+
 
     return (
         <div className={"log-in-form"}>
 
             <h3>
-                LogIn
+                Log In
             </h3>
 
-            <input className={"login-input"} type={"text"} id={"username"} placeholder={"username"} />
+            <TextField 
+                className   = { "sign-in-input" }
+                variant     = { "outlined"      } 
+                size        = { "small"         } 
+                label       = { "username"      } 
+                onBlur      = { ( { target } ) => { 
+                                    username = target.value;
 
-            <input className={"login-input"} type={"password"} id={"password"} placeholder={"password"} />
+                                    if( !username && inputStatus !== InputStatus.INVALID_USERNAME )
+                                    {
+                                        setInputStatus( InputStatus.INVALID_USERNAME );
+                                    }
+                                    else if( inputStatus !== InputStatus.OK )
+                                    {
+                                        setInputStatus( InputStatus.OK );
+                                    }
+                                } 
+                              }
+                />
+
+            <TextField 
+                className   = { "sign-in-input" }
+                variant     = { "outlined"      } 
+                size        = { "small"         } 
+                label       = { "password"      } 
+                type        = { "password"      } 
+                onBlur      = { ( { target } ) => { 
+                                    password = target.value;
+
+                                    if( !password && inputStatus !== InputStatus.INVALID_PASSWORD )
+                                    {
+                                        setInputStatus( InputStatus.INVALID_PASSWORD );
+                                    }
+                                    else if( inputStatus !== InputStatus.OK )
+                                    {
+                                        setInputStatus( InputStatus.OK );
+                                    }
+                                } 
+                              }
+                />
+
+            <Button
+                variant   = {"contained"}
+                color     = {"primary"}
+                disabled  = { !!loading || inputStatus !== InputStatus.OK } 
+                onClick   = { ( _ ) => {
+                                
+                                if( !username )
+                                {
+                                    setInputStatus( InputStatus.INVALID_USERNAME );
+                                }
+                                else if ( !password )
+                                {
+                                    setInputStatus( InputStatus.INVALID_PASSWORD );
+                                }
+
+                                const auth = `Basic ${ btoa( `${username}:${password}` ) }`;
+
+                                const opts: MutationFunctionOptions<LogInData, Record<string, any>> =
+                                {   
+                                    context: {
+                                        headers: {
+                                            Authorization: auth
+                                        }
+                                    }
+                                };
+
+                                console.info( opts );
+                                
+                                logIn( opts ).then( e => { console.info("result: ", e )}).catch( e => { /* catching the error */ } );
+                             }
+                           }>
+                Log In
+                {
+                    loading ? <CircularProgress size={"small"}/> : <span></span>
+                }
+            </Button>
+
+            <AlertHolder/>
 
             <p className={"login-signin-link"} onClick={ ()=>{  setSignIn( true ); } }> 
                 Or sign in instead
@@ -112,7 +259,7 @@ const SignInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
         {
             setPwdStatus( UserInfo.NO_LOWER_CASE_CHARS ); 
         }
-        else if( pwdStatus != UserInfo.OK )
+        else if( pwdStatus !== UserInfo.OK )
         {
             setPwdStatus( UserInfo.OK ); 
 
@@ -135,7 +282,7 @@ const SignInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
 
             isValid = false;
         }
-        else if( emailStatus != UserInfo.OK )
+        else if( emailStatus !== UserInfo.OK )
         {
             setEmailStatus( UserInfo.OK );
         }
@@ -180,10 +327,9 @@ const SignInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
     }
     else if ( data && data.signIn )
     {
-
         const { user, statusCode } = data.signIn;
 
-        if( statusCode  == 0 )
+        if( statusCode === 0 )
         {
             userVar( user );
 
@@ -227,8 +373,8 @@ const SignInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
                                         validateUsername( username );
                                     } 
                                 }
-                    error       = { usernameStatus != UserInfo.OK }
-                    helperText  = { usernameStatus != UserInfo.OK ? helperTexts[usernameStatus] : "" }
+                    error       = { usernameStatus !== UserInfo.OK }
+                    helperText  = { usernameStatus !== UserInfo.OK ? helperTexts[usernameStatus] : "" }
                 />
 
                 <TextField
@@ -245,8 +391,8 @@ const SignInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
                                         validateEmail( email );
                                     }
                                 } 
-                    error       = { emailStatus != UserInfo.OK }
-                    helperText  = { emailStatus != UserInfo.OK ? helperTexts[emailStatus] : "" }
+                    error       = { emailStatus !== UserInfo.OK }
+                    helperText  = { emailStatus !== UserInfo.OK ? helperTexts[emailStatus] : "" }
                     />
 
                 <TextField
@@ -263,8 +409,8 @@ const SignInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
                                         validatePwd( pwd );
                                     } 
                                 }
-                    error       = { pwdStatus != UserInfo.OK }
-                    helperText  = { pwdStatus != UserInfo.OK ? helperTexts[pwdStatus] : "" }
+                    error       = { pwdStatus !== UserInfo.OK }
+                    helperText  = { pwdStatus !== UserInfo.OK ? helperTexts[pwdStatus] : "" }
                     />
 
             </div> 
@@ -272,8 +418,8 @@ const SignInForm: FunctionComponent<any> = ( { setSignIn }: any ) => {
             <div className={ "sign-in-foot" }> 
 
                 <Button
-                    variant={"contained"}
-                    color={"primary"}
+                    variant   = {"contained"}
+                    color     = {"primary"}
                     onClick   = { () => {
                                         if( !validateUsername( username ) || 
                                             !validateEmail( email ) ||

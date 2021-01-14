@@ -1,4 +1,4 @@
-export default interface UploadBookResponse
+interface UploadBookResponse
 {
     filename:        string;
     size:            number;
@@ -10,3 +10,12 @@ export default interface UploadBookResponse
 
     uploadDate:      Date;
 }
+
+
+
+interface UploadBookData 
+{
+    uploadBook: UploadBookResponse
+}
+
+export default UploadBookData;
